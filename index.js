@@ -1,3 +1,13 @@
+// Função para formatar o valor para o formato esperado (200000.00)
+function formatarValor(valor) {
+  // Remove todos os caracteres não numéricos, exceto ponto e vírgula
+  const valorFormatado = valor.replace(/[^0-9,.]/g, "");
+  // Substitui vírgulas por pontos para usar um formato numérico adequado
+  const valorComPonto = valorFormatado.replace(",", ".");
+  // Converte para float
+  return parseFloat(valorComPonto);
+}
+
 function SimuladorParcelamento() {
   this.valorTotal = 0;
   this.quantidadeParcelas = 0;
@@ -37,55 +47,62 @@ function SimuladorParcelamento() {
 }
 
 SimuladorParcelamento.prototype.solicitarValorTotal = function () {
-  while (true) {
-      this.valorTotal = parseFloat(prompt("Digite o valor total a ser financiado (use ponto para separar os milhares e vírgula para os decimais, se necessário). Exemplo: 10000.50 para dez mil reais e cinquenta centavos:"));
-      if (!isNaN(this.valorTotal) && this.valorTotal > 0) {
-          break;
-      } else {
-          alert("Valor inválido. Por favor, digite um número válido maior que zero.");
-      }
+  const valorTotalInput = document.getElementById("valorTotal").value;
+  this.valorTotal = formatarValor(valorTotalInput);
+
+  if (isNaN(this.valorTotal) || this.valorTotal <= 0) {
+    alert("Valor inválido. Por favor, digite um número válido maior que zero.");
+    return false;
   }
+
+  return true;
 };
 
+
 SimuladorParcelamento.prototype.solicitarQuantidadeParcelas = function () {
-  while (true) {
-      this.quantidadeParcelas = parseInt(prompt("Digite a quantidade de parcelas desejada (apenas números inteiros). Exemplo: 12 para doze parcelas:"));
-      if (!isNaN(this.quantidadeParcelas) && this.quantidadeParcelas > 0) {
-          break;
-      } else {
-          alert("Quantidade de parcelas inválida. Por favor, digite um número válido maior que zero.");
-      }
+  const quantidadeParcelasInput = document.getElementById("quantidadeParcelas");
+  this.quantidadeParcelas = parseInt(quantidadeParcelasInput.value);
+
+  if (isNaN(this.quantidadeParcelas) || this.quantidadeParcelas <= 0) {
+      alert("Quantidade de parcelas inválida. Por favor, digite um número válido maior que zero.");
+      return false;
   }
+
+  return true;
 };
 
 SimuladorParcelamento.prototype.selecionarBanco = function () {
-  let opcoesBancos = this.bancos.map((banco, index) => `${index + 1} - ${banco.nome}`).join("\n");
-  let escolha;
-  do {
-      escolha = parseInt(prompt(`Selecione o banco para o financiamento:\n${opcoesBancos}`));
-  } while (isNaN(escolha) || escolha < 1 || escolha > this.bancos.length);
-
+  const selectBanco = document.getElementById("selectBanco");
+  const escolha = selectBanco.value;
+  
   const { taxaMensal } = this.bancos[escolha - 1];
   this.taxaJuros = taxaMensal;
 };
 
 SimuladorParcelamento.prototype.calcularParcelamento = function () {
   const taxaMensal = this.taxaJuros / 100; // A taxa de juros deve ser convertida em decimal.
-  const fator = Math.pow(1 + taxaMensal, this.quantidadeParcelas);
-  const valorParcela = this.valorTotal * ((taxaMensal * fator) / (fator - 1));
+  const n = this.quantidadeParcelas;
+  let q0 = this.valorTotal;
 
-  alert("Simulação de parcelamento:");
-  for (let i = 1; i <= this.quantidadeParcelas; i++) {
-      alert(`Parcela ${i}: R$ ${valorParcela.toFixed(2)}`);
+  const resultadoParcelamento = document.getElementById("resultadoParcelamento");
+  resultadoParcelamento.innerHTML = ""; // Limpa o conteúdo anterior, se houver.
+
+  resultadoParcelamento.innerHTML += "<h3>Simulação de parcelamento:</h3>";
+  const p = (q0 * taxaMensal) / (1 - Math.pow(1 + taxaMensal, -n));
+  for (let i = 1; i <= n; i++) {
+    const jurosParcela = q0 * taxaMensal;
+    const amortizacaoParcela = p - jurosParcela;
+    resultadoParcelamento.innerHTML += `<p>Parcela ${i}: R$ ${p.toFixed(2)} (Juros: R$ ${jurosParcela.toFixed(2)}, Amortização: R$ ${amortizacaoParcela.toFixed(2)})</p>`;
+    q0 -= amortizacaoParcela;
   }
 };
 
 
 
-const simulador = new SimuladorParcelamento();
-alert("Bem-vindo ao simulador de parcelamento de financiamento.");
-
-simulador.solicitarValorTotal();
-simulador.solicitarQuantidadeParcelas();
-simulador.selecionarBanco();
-simulador.calcularParcelamento();
+function iniciarSimulacao() {
+  const simulador = new SimuladorParcelamento();
+  if (simulador.solicitarValorTotal() && simulador.solicitarQuantidadeParcelas()) {
+      simulador.selecionarBanco();
+      simulador.calcularParcelamento();
+  }
+}

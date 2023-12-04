@@ -3,9 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador JavaScript</title>
+    <title>Simulador de Parcelamento</title>
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
+    <header>
+        <h1>Simulador de Parcelamento</h1>
+    </header>
+    <main>
+        <div class="simulator-container">
+            <h2>Simulação de Financiamento</h2>
+            <form>
+                <label for="valorTotal">Valor Total a ser Financiado:</label>
+                <input type="text" id="valorTotal" placeholder="Digite o valor total">
+                
+                <label for="quantidadeParcelas">Quantidade de Parcelas:</label>
+                <input type="text" id="quantidadeParcelas" placeholder="Digite a quantidade de parcelas">
+
+                <label for="selectBanco">Selecione o Banco:</label>
+                <select id="selectBanco">
+                    <!-- Opções de bancos podem ser geradas dinamicamente com JavaScript -->
+                </select>
+
+                <button id="calcularBtn">Calcular Parcelamento</button>
+            </form>
+        </div>
+        <div class="result-container">
+            <h2>Resultado da Simulação</h2>
+            <div id="resultadoParcelamento">
+                <!-- Os resultados da simulação serão exibidos aqui -->
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Simulador de Parcelamento</p>
+    </footer>
     <script src="index.js"></script>
+</body>
+</html>
 </body>
 </html>

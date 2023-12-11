@@ -22,41 +22,10 @@
 
                 <label for="selectBanco">Selecione o Banco:</label>
                 <select id="selectBanco">
-                    <!-- Opções de bancos podem ser geradas dinamicamente com JavaScript -->
-                    <option value="1">SINOSSERRA S/A - SCFI</option>
-                    <option value="2">DEUTSCHE SPARKASSEN LEASING DO BRASIL BM S.A.</option>
-                    <option value="3">BCO CATERPILLAR S.A.</option>
-                    <option value="4">BCO DE LAGE LANDEN BRASIL S.A.</option>
-                    <option value="5">BCO VOLVO BRASIL S.A.</option>
-                    <option value="6">BCO. J.SAFRA S.A.</option>
-                    <option value="7">BCO VOLKSWAGEN S.A</option>
-                    <option value="8">BANCO SICOOB S.A.</option>
-                    <option value="9">FINANC ALFA S.A. CFI</option>
-                    <option value="10">BRB - CFI S/A</option>
-                    <option value="11">BCO DO EST. DO PA S.A.</option>
-                    <option value="12">BCO XCMG BRASIL S.A.</option>
-                    <option value="13">BANCO CNH INDUSTRIAL CAPITAL S.A</option>
-                    <option value="14">BCO BANESTES S.A.</option>
-                    <option value="15">AYMORÉ CFI S.A.</option>
-                    <option value="16">BCO BRADESCO S.A.</option>
-                    <option value="17">BCO SANTANDER (BRASIL) S.A.</option>
-                    <option value="18">BCO DO ESTADO DO RS S.A.</option>
-                    <option value="19">TODESCREDI S/A - CFI</option>
-                    <option value="20">PINTOS S.A. CFI</option>
-                    <option value="21">BCO VOTORANTIM S.A.</option>
-                    <option value="22">BCO DO BRASIL S.A.</option>
-                    <option value="23">BCO BRASILEIRO DE CRÉDITO S.A.</option>
-                    <option value="24">BCO SENFF S.A.</option>
-                    <option value="25">BCO RENDIMENTO S.A.</option>
-                    <option value="26">BCO BRADESCO FINANC. S.A.</option>
-                    <option value="27">BCO HONDA S.A.</option>
-                    <option value="28">CENTROCRED S.A. CFI</option>
-                    <option value="29">KREDILIG S.A. - CFI</option>
-                    <option value="30">HS FINANCEIRA</option>
-                    <!-- Adicione as demais opções aqui -->
+                    <!-- Opções de bancos serão geradas dinamicamente com JavaScript -->
                 </select>
 
-                <button id="calcularBtn" type="button" onclick="iniciarSimulacao()">Calcular Parcelamento</button>
+                <button id="calcularBtn" type="button">Calcular Parcelamento</button>
             </form>
         </div>
         <div class="result-container">
@@ -69,6 +38,106 @@
     <footer>
         <p>&copy; 2023 Simulador de Parcelamento</p>
     </footer>
-    <script src="index.js"></script>
+    <script>
+        // Estrutura de dados em JSON para definir dados iniciais
+        const dadosIniciais = {
+            bancos: [
+                { nome: "SINOSSERRA S/A - SCFI", taxaMensal: 0.21 },
+                { nome: "DEUTSCHE SPARKASSEN LEASING DO BRASIL BM S.A.", taxaMensal: 0.73 },
+                { nome: "BCO CATERPILLAR S.A.", taxaMensal: 1.05 },
+                { nome: "BCO DE LAGE LANDEN BRASIL S.A.", taxaMensal: 1.09 },
+                { nome: "BCO VOLVO BRASIL S.A.", taxaMensal: 1.33 },
+                { nome: "BCO. J.SAFRA S.A.", taxaMensal: 1.35 },
+                { nome: "BCO VOLKSWAGEN S.A", taxaMensal: 1.39 },
+                { nome: "BANCO SICOOB S.A.", taxaMensal: 1.40 },
+                { nome: "FINANC ALFA S.A. CFI", taxaMensal: 1.44 },
+                { nome: "BRB - CFI S/A", taxaMensal: 1.49 },
+                { nome: "BCO DO EST. DO PA S.A.", taxaMensal: 1.59 },
+                { nome: "BCO XCMG BRASIL S.A.", taxaMensal: 1.60 },
+                { nome: "BANCO CNH INDUSTRIAL CAPITAL S.A", taxaMensal: 1.66 },
+                { nome: "BCO BANESTES S.A.", taxaMensal: 1.79 },
+                { nome: "AYMORÉ CFI S.A.", taxaMensal: 1.81 },
+                { nome: "BCO BRADESCO S.A.", taxaMensal: 1.86 },
+                { nome: "BCO SANTANDER (BRASIL) S.A.", taxaMensal: 1.95 },
+                { nome: "BCO DO ESTADO DO RS S.A.", taxaMensal: 2.05 },
+                { nome: "TODESCREDI S/A - CFI", taxaMensal: 2.05 },
+                { nome: "PINTOS S.A. CFI", taxaMensal: 2.08 },
+                { nome: "BCO VOTORANTIM S.A.", taxaMensal: 2.14 },
+                { nome: "BCO DO BRASIL S.A.", taxaMensal: 2.20 },
+                { nome: "BCO BRASILEIRO DE CRÉDITO S.A.", taxaMensal: 2.27 },
+                { nome: "BCO SENFF S.A.", taxaMensal: 2.86 },
+                { nome: "BCO RENDIMENTO S.A.", taxaMensal: 3.52 },
+                { nome: "BCO BRADESCO FINANC. S.A.", taxaMensal: 3.86 },
+                { nome: "BCO HONDA S.A.", taxaMensal: 4.16 },
+                { nome: "CENTROCRED S.A. CFI", taxaMensal: 4.17 },
+                { nome: "KREDILIG S.A. - CFI", taxaMensal: 4.39 },
+                { nome: "HS FINANCEIRA", taxaMensal: 4.41 }
+                // Adicione outros bancos e suas taxas aqui
+            ],
+        };
+
+        // Função para popular o select com opções de bancos
+        function popularSelectBancos() {
+            const selectBanco = document.getElementById("selectBanco");
+            dadosIniciais.bancos.forEach((banco, index) => {
+                const option = document.createElement("option");
+                option.value = index;
+                option.textContent = banco.nome;
+                selectBanco.appendChild(option);
+            });
+        }
+
+        // Função para calcular o parcelamento
+        function calcularParcelamento() {
+            const valorTotalInput = document.getElementById("valorTotal").value;
+            const quantidadeParcelasInput = document.getElementById("quantidadeParcelas").value;
+            const escolha = document.getElementById("selectBanco").value;
+
+            const valorTotal = parseFloat(valorTotalInput);
+            const quantidadeParcelas = parseInt(quantidadeParcelasInput);
+            const taxaJuros = dadosIniciais.bancos[escolha].taxaMensal / 100;
+            
+            if (isNaN(valorTotal) || isNaN(quantidadeParcelas) || quantidadeParcelas <= 0 || valorTotal <= 0) {
+                alert("Valores inválidos. Por favor, digite números válidos maiores que zero.");
+                return;
+            }
+
+            const resultadoParcelamento = document.getElementById("resultadoParcelamento");
+            resultadoParcelamento.innerHTML = "";
+            resultadoParcelamento.innerHTML += "<h3>Simulação de parcelamento:</h3>";
+
+            const p = (valorTotal * taxaJuros) / (1 - Math.pow(1 + taxaJuros, -quantidadeParcelas));
+            let q0 = valorTotal;
+
+            for (let i = 1; i <= quantidadeParcelas; i++) {
+                const jurosParcela = q0 * taxaJuros;
+                const amortizacaoParcela = p - jurosParcela;
+                resultadoParcelamento.innerHTML += `<p>Parcela ${i}: R$ ${p.toFixed(2)} (Juros: R$ ${jurosParcela.toFixed(2)}, Amortização: R$ ${amortizacaoParcela.toFixed(2)})</p>`;
+                q0 -= amortizacaoParcela;
+            }
+            
+            // Armazene a última seleção de banco no localStorage
+            localStorage.setItem("ultimaSelecaoBanco", escolha);
+        }
+
+        // Função para carregar a última seleção de banco do localStorage, se existir
+        function carregarUltimaSelecaoBanco() {
+            const ultimaSelecaoBanco = localStorage.getItem("ultimaSelecaoBanco");
+            if (ultimaSelecaoBanco !== null) {
+                document.getElementById("selectBanco").value = ultimaSelecaoBanco;
+            }
+        }
+
+        // Event Listener para carregar a última seleção de banco ao carregar a página
+        window.addEventListener("DOMContentLoaded", () => {
+            popularSelectBancos(); // Popula o select com opções de bancos
+            carregarUltimaSelecaoBanco(); // Carrega a última seleção de banco, se existir
+
+            // Event Listener para o botão "Calcular Parcelamento"
+            document.getElementById("calcularBtn").addEventListener("click", () => {
+                calcularParcelamento();
+            });
+        });
+    </script>
 </body>
 </html>
